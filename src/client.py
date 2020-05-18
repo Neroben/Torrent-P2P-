@@ -11,7 +11,7 @@ class Client(object):
         varstr = 'Hi!' + ':' + str(addr[1])
         sock.send(varstr.encode())
 
-        data = sock.recv(1024).decode()
+        data = sock.recv(15).decode()
         sock.close()
         if data == 'Hi!':
             return True
@@ -47,3 +47,12 @@ class Client(object):
                 break
         sock.close()
         return pickle.loads(fulldata)
+
+
+    def get_file_on_node(self, addr, filename):
+        sock = socket.socket()
+        sock.connect(addr)
+        request = 'get' + ':' + str(filename)
+        sock.send(request.encode())
+
+        sock.close()
