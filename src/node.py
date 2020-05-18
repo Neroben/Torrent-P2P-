@@ -14,7 +14,7 @@ class Node(object):
         self.networkInfo = NetworkInfo()
         self.data_node = DataNode(directory)
         # запуск серверва
-        self.server = Server(port, self.networkInfo, size_acceptance)
+        self.server = Server(port, self.networkInfo, self.data_node, size_acceptance)
         self.server.start()
 
     # подключение к сети

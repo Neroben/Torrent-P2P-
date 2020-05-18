@@ -3,6 +3,7 @@ from threading import Thread
 
 from src.datanode import DataNode
 from src.networkInfo import NetworkInfo
+import pickle
 
 
 class Server(Thread):
@@ -23,6 +24,7 @@ class Server(Thread):
         self.port = port
         self.size_acceptance = size_acceptance
         self.info_net = info_net
+        self.data_node = data_node
         Thread.__init__(self)
 
     def run(self):
@@ -44,8 +46,8 @@ class Server(Thread):
             conn.send('Hi!'.encode())
             return
         if data == 'List files':
-            for name in self.data_node.list_files:
-                conn.send(name.encode())
+            varsend = self.data_node.list_files()
+            conn.send(pickle.dumps(varsend) + b'000')
 
 
 

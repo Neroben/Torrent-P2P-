@@ -8,6 +8,6 @@ class DataNode(object):
         self.directory = directory
 
     # получение списка доступных файлов
-    def get_list_file(self):
+    def list_files(self):
         return os.listdir(self.directory)
 

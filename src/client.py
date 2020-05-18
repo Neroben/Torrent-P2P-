@@ -21,9 +21,11 @@ class Client(object):
         self.sock.send('List files'.encode())
 
         list_file = list()
+        fulldata = b''
         while True:
-            data = self.sock.recv(1024).decode()
-            if not data:
+            data: bytes = self.sock.recv(1024)
+            fulldata =fulldata + data
+            if b'000' in fulldata:
                 break
-            list_file.append(data)
-        return list_file
+        self.sock.close()
+        return pickle.loads(fulldata)
