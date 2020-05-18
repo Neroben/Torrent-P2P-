@@ -41,13 +41,17 @@ class Server(Thread):
                 self.processing_data(conn, addr, data)
 
     def processing_data(self, conn, addr, data):
-        if data == 'Hi!':
-            self.info_net.new_node(addr)
+
+        if data.split(':')[0] == 'Hi!':
+            self.info_net.new_node((addr[0], data.split(':')[1]))
             conn.send('Hi!'.encode())
             return
         if data == 'List files':
-            varsend = self.data_node.list_files()
-            conn.send(pickle.dumps(varsend) + b'000')
+            conn.send(pickle.dumps(self.data_node.list_files()) + b'000')
+            return
+        if data == 'List addr':
+            conn.send(pickle.dumps(self.info_net.node_addr) + b'000')
+
 
 
 

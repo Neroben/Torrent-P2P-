@@ -19,8 +19,13 @@ class Node(object):
 
     # подключение к сети
     def connect_network(self, addr):
-        addr = self.client.connect_net(addr)
+        self.client.connect_net(addr)
         self.networkInfo.new_node(addr)
 
+    # получение списка доступных файлов
     def get_list_file_on_node(self, addr):
         return self.client.get_list_file_on_node(addr)
+
+    # получение списка адресов узла
+    def get_list_addr_on_node(self, addr):
+        return self.client.get_list_addr_on_node(addr)

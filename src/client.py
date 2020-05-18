@@ -3,29 +3,47 @@ import pickle
 
 
 class Client(object):
-    sock: socket = socket.socket()
 
     # подключение к узлу (обмен адресами)
     def connect_net(self, addr) -> bool:
-        self.sock.connect(addr)
-        self.sock.send('Hi!'.encode())
+        sock = socket.socket()
+        sock.connect(addr)
+        varstr = 'Hi!' + ':' + str(addr[1])
+        sock.send(varstr.encode())
 
-        data = self.sock.recv(1024).decode()
+        data = sock.recv(1024).decode()
+        sock.close()
         if data == 'Hi!':
             return True
         return False
 
     # запрос доступных файлов узла
     def get_list_file_on_node(self, addr):
-        self.sock.connect(addr)
-        self.sock.send('List files'.encode())
+        sock = socket.socket()
+        sock.connect(addr)
+        sock.send('List files'.encode())
 
         list_file = list()
         fulldata = b''
         while True:
-            data: bytes = self.sock.recv(1024)
+            data: bytes = sock.recv(1024)
             fulldata =fulldata + data
             if b'000' in fulldata:
                 break
-        self.sock.close()
+        sock.close()
+        return pickle.loads(fulldata)
+
+    # запрос работающих адресов узлов из узла по адресу
+    def get_list_addr_on_node(self, addr):
+        sock = socket.socket()
+        sock.connect(addr)
+        sock.send('List addr'.encode())
+
+        fulldata = b''
+        while True:
+            data: bytes = sock.recv(1024)
+            fulldata = fulldata + data
+            if b'000' in fulldata:
+                break
+        sock.close()
         return pickle.loads(fulldata)
