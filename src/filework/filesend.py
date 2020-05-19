@@ -1,7 +1,6 @@
-from src.filework.workfile import WorkFile
+from threading import Thread
 
-
-class FileSend(WorkFile):
+class FileSend(Thread):
 
     # получение части файла
     def get_part(self, part):
