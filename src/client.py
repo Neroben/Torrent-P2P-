@@ -51,19 +51,6 @@ def get_list_addr_on_node(addr):
 
 
 # получить файл filename из узла, в папку directory
-def get_file_on_node(addr, filename, directory):
-    sock = socket.socket()
-    sock.connect(addr)
-    request = 'get' + ':' + str(filename)
-    sock.send(request.encode())
-
-    FileRecv(sock, directory, filename)
-
-    answer = sock.recv(100).decode()
-    if answer == 'Not file!':
-        return False
-    # file:кол-во частей:размер части
-    temp = answer.split(':')
-    a = FileRecv(sock, directory, filename)
+def get_file_on_node(addr, filename, directory, free_port):
+    a = FileRecv(directory, filename, addr, free_port)
     a.start()
-    sock.close()

@@ -52,8 +52,4 @@ class Server(Thread):
         if data == 'List addr':
             conn.send(pickle.dumps(self.info_net.node_addr) + b'000')
         if data.split(':')[0] == 'get':
-            FileSend(self.data_node.directory + '\\' + data.split(':')[1], self.sock, 1024).start()
-
-
-
-
+            FileSend(self.data_node.directory + '\\' + data.split(':')[1], 1024, (addr[0], data.split(':')[2])).start()

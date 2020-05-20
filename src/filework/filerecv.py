@@ -19,18 +19,31 @@ class FileRecv(Thread):
     size_part: int
     # сокет запроса частей
     sock: socket
+    # свободный порт для приема данных
+    free_port: int
+    # хост из которого будут идти данные
+    host: str
 
-    def __init__(self, sock: socket, directory: str, filename: str):
+    def __init__(self, directory: str, filename: str, addr, free_port):
         Thread.__init__(self)
-        self.sock = sock
+        self.sock = socket.socket()
+        self.sock.connect(addr)
+        self.free_port = int(free_port)
+        request = 'get:' + str(filename) + ':' + str(self.free_port)
+        self.sock.send(request.encode())
+        self.sock.close()
         self.directory = directory
         self.filename = filename
+        self.host = addr[0]
         self.generate_dir()
 
     def run(self):
-        info = self.sock.recv(50)
-        self.count_part = info.split(':')[1]
-        self.size_part = info.split(':')[2]
+        self.sock = socket.socket()
+        self.sock.bind((self.host, self.free_port))
+        self.sock, addr = self.sock.accept()
+        info = self.sock.recv(50).decode()
+        self.count_part = int(info.split(':')[1])
+        self.size_part = int(info.split(':')[2])
         while True:
             list_file = self.check_integrity_speed()
             if not list_file:
@@ -43,7 +56,7 @@ class FileRecv(Thread):
 
     # создание папки для частей файла
     def generate_dir(self):
-        self.directory_part = self.directory + self.filename.split('.')[0] + 'part'
+        self.directory_part = self.directory + '\\' + self.filename.split('.')[0] + 'part'
         os.mkdir(self.directory_part)
 
     # сохранение части файла (часть, данные)
@@ -84,4 +97,3 @@ class FileRecv(Thread):
         # получение списка доступных файлов
     def list_files(self):
         return os.listdir(self.directory)
-

@@ -29,5 +29,5 @@ class Node(object):
     def get_list_addr_on_node(self, addr):
         return get_list_addr_on_node(addr)
 
-    def get_file_on_node(self, addr, filename):
-        get_file_on_node(addr, filename, self.data_node.directory)
+    def get_file_on_node(self, addr, filename, free_port):
+        get_file_on_node(addr, filename, self.data_node.directory, free_port)
