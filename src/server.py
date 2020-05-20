@@ -2,6 +2,7 @@ import socket
 from threading import Thread
 
 from src.datanode import DataNode
+from src.filework.filesend import FileSend
 from src.networkInfo import NetworkInfo
 import pickle
 
@@ -17,7 +18,6 @@ class Server(Thread):
     info_net: NetworkInfo
     # данные
     data_node: DataNode
-
 
     def __init__(self, port, info_net, data_node, size_acceptance):
         """Инициализация потока"""
@@ -51,6 +51,8 @@ class Server(Thread):
             return
         if data == 'List addr':
             conn.send(pickle.dumps(self.info_net.node_addr) + b'000')
+        if data.split(':')[0] == 'get':
+            FileSend(self.data_node.directory + '\\' + data.split(':')[1], self.sock, 1024).start()
 
 
 

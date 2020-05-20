@@ -20,23 +20,24 @@ class FileRecv(Thread):
     # сокет запроса частей
     sock: socket
 
-    def __init__(self, sock: socket, directory: str, filename: str, count_part: int, size_part: int):
+    def __init__(self, sock: socket, directory: str, filename: str):
         Thread.__init__(self)
         self.sock = sock
         self.directory = directory
         self.filename = filename
-        self.count_part = count_part
-        self.size_part = size_part
         self.generate_dir()
 
     def run(self):
+        info = self.sock.recv(50)
+        self.count_part = info.split(':')[1]
+        self.size_part = info.split(':')[2]
         while True:
             list_file = self.check_integrity_speed()
             if not list_file:
                 self.build_file()
                 break
             for file in list_file:
-                self.sock.send('get_part:' + self.filename + ':' + str(file))
+                self.sock.send(('get_part:' + ':' + str(file)).encode())
                 self.save_part(str(file), self.sock.recv(self.size_part))
         self.sock.close()
 
