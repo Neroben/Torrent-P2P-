@@ -29,14 +29,14 @@ class FileSend(Thread):
         # отправляем информацию о файле
         self.sock = socket.socket()
         self.sock.connect((self.host, self.port))
-        self.sock.send(('info' + ':' + str(self.count_part) + ':' + str(self.size_part)).encode())
+        self.sock.send(('info:' + str(self.count_part) + ':' + str(self.size_part)).encode())
         # ждём запросы на файл
         while self.sock:
             request = self.sock.recv(50).decode()
-            self.sock.send(self.get_part(request.split(':')[1]))
+            self.sock.send(self.get_part(int(request.split(':')[1])))
 
     # получение части файла
-    def get_part(self, part):
+    def get_part(self, part: int):
         f = open(self.directory, 'rb')
         if 0 >= part > self.count_part:
             return False

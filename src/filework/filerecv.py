@@ -39,8 +39,10 @@ class FileRecv(Thread):
 
     def run(self):
         self.sock = socket.socket()
-        self.sock.bind((self.host, self.free_port))
-        self.sock, addr = self.sock.accept()
+        self.sock.bind(('', self.free_port))
+        self.sock.listen(1)
+        conn, addr = self.sock.accept()
+        self.sock = conn
         info = self.sock.recv(50).decode()
         self.count_part = int(info.split(':')[1])
         self.size_part = int(info.split(':')[2])
@@ -48,10 +50,12 @@ class FileRecv(Thread):
             list_file = self.check_integrity_speed()
             if not list_file:
                 self.build_file()
+                shutil.rmtree(self.directory_part)
                 break
             for file in list_file:
-                self.sock.send(('get_part:' + ':' + str(file)).encode())
+                self.sock.send(('get_part:' + str(file)).encode())
                 self.save_part(str(file), self.sock.recv(self.size_part))
+                self.integrity.add(file)
         self.sock.close()
 
     # создание папки для частей файла
@@ -61,7 +65,7 @@ class FileRecv(Thread):
 
     # сохранение части файла (часть, данные)
     def save_part(self, part: str, data: bytes):
-        f = open(self.directory_part + part, 'wb')
+        f = open(self.directory_part + '\\' + part, 'wb')
         f.write(data)
         self.integrity.add(part)
 
@@ -78,7 +82,7 @@ class FileRecv(Thread):
         filenames = self.list_files()
         list_file = list()
         for a in range(self.count_part):
-            if a not in filenames:
+            if str(a) not in filenames:
                 list_file.append(a)
         return list_file
 
@@ -87,13 +91,12 @@ class FileRecv(Thread):
         temp = self.check_integrity()
         if temp:
             return temp
-        fin = open(self.directory + self.filename, 'wb')
+        fin = open(self.directory + '\\' + self.filename, 'wb')
         for a in range(self.count_part):
-            f_out = open(self.directory_part + str(a), 'rb')
+            f_out = open(self.directory_part + '\\' + str(a), 'rb')
             data = f_out.read()
             fin.write(data)
-        shutil.rmtree(self.directory_part)
 
         # получение списка доступных файлов
     def list_files(self):
-        return os.listdir(self.directory)
+        return os.listdir(self.directory_part)
