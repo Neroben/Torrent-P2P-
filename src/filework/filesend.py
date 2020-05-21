@@ -31,8 +31,10 @@ class FileSend(Thread):
         self.sock.connect((self.host, self.port))
         self.sock.send(('info:' + str(self.count_part) + ':' + str(self.size_part)).encode())
         # ждём запросы на файл
-        while self.sock:
+        while self.sock.fileno() != -1:
             request = self.sock.recv(50).decode()
+            if request == 'close':
+                break
             self.sock.send(self.get_part(int(request.split(':')[1])))
 
     # получение части файла

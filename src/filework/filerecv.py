@@ -39,7 +39,7 @@ class FileRecv(Thread):
 
     def run(self):
         self.sock = socket.socket()
-        self.sock.bind(('', self.free_port))
+        self.sock.bind((self.host, self.free_port))
         self.sock.listen(1)
         conn, addr = self.sock.accept()
         self.sock = conn
@@ -56,6 +56,7 @@ class FileRecv(Thread):
                 self.sock.send(('get_part:' + str(file)).encode())
                 self.save_part(str(file), self.sock.recv(self.size_part))
                 self.integrity.add(file)
+        self.sock.send('close'.encode())
         self.sock.close()
 
     # создание папки для частей файла
