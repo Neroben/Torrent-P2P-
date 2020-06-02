@@ -18,8 +18,8 @@ class Node(object):
 
     # подключение к сети
     def connect_network(self, addr):
-        connect_net(addr)
-        self.networkInfo.new_node(addr)
+        if connect_net(addr):
+            self.networkInfo.new_node(addr)
 
     # получение списка доступных файлов
     def get_list_file_on_node(self, addr):
@@ -29,5 +29,17 @@ class Node(object):
     def get_list_addr_on_node(self, addr):
         return get_list_addr_on_node(addr)
 
+    # получить файл filename по адресу addr, порт приема free_port
     def get_file_on_node(self, addr, filename, free_port):
         get_file_on_node(addr, filename, self.data_node.directory, free_port)
+
+    # список подключенных узлов
+    def get_list_connect_addr(self):
+        self.check_connect_addr()
+        return self.networkInfo.node_addr
+
+    # проверка подключенных узлов
+    def check_connect_addr(self):
+        for addr in self.networkInfo.node_addr:
+            if not connect_net(addr):
+                self.networkInfo.node_addr.discard(addr)

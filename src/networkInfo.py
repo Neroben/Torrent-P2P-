@@ -1,7 +1,7 @@
 
 
 class NetworkInfo(object):
-    node_addr = list()
+    node_addr = set()
 
     def new_node(self, addr):
-        self.node_addr.append(str(addr[0]) + ':' + str(addr[1]))
+        self.node_addr.add(str(addr[0]) + ':' + str(addr[1]))

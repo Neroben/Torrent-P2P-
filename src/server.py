@@ -33,12 +33,15 @@ class Server(Thread):
         # разрешить подключение к соккету
         self.sock.listen(1)
         while True:
-            conn, addr = self.sock.accept()
-            while True:
-                data = conn.recv(self.size_acceptance).decode()
-                if not data:
-                    break
-                self.processing_data(conn, addr, data)
+            try:
+                conn, addr = self.sock.accept()
+                while True:
+                    data = conn.recv(self.size_acceptance).decode()
+                    if not data:
+                        break
+                    self.processing_data(conn, addr, data)
+            except socket.error:
+                print('Ошибка соединения, связь разована. Сервер ожидает другие соединения')
 
     def processing_data(self, conn, addr, data):
 
